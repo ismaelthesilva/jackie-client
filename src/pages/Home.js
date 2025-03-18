@@ -2,7 +2,6 @@ import React from 'react';
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles.css'; // Custom CSS
-import Users from '../components/Users'; // Assuming this displays user testimonials or stats
 
 function Home() {
   return (
@@ -95,16 +94,6 @@ function Home() {
           <Button variant="warning" size="lg" href="#signup">
             Join Now
           </Button>
-        </Container>
-      </section>
-
-      {/* Users Component (Testimonials or Stats) */}
-      <section className="py-5" style={{ backgroundColor: '#F5F6F5' }}>
-        <Container>
-          <h2 className="text-center mb-5 fw-bold" style={{ color: '#008080' }}>
-            Success Stories
-          </h2>
-          <Users /> {/* Assuming this renders user-related content */}
         </Container>
       </section>
 

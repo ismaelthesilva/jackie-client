@@ -2,10 +2,9 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar'; // Updated path
 import Home from './pages/Home';
-import Performance from './pages/Performance';
+import Nutrition from './pages/Nutrition';
 import Techniques from './pages/Techniques';
 import Diet from './pages/Diet';
-import Rankings from './pages/Rankings';
 import PageOne from './pages/landingPages/pageOne/PageOne';
 import IndexPage from './pages/landingPages/htmlText/index';
 import BJJ40USA from "./pages/landingPages/bjjusa/bjj40usa";
@@ -36,10 +35,9 @@ function App() {
         {/* Pages with Navbar */}
         <Route element={<LayoutWithNavbar />}>
           <Route path="/" element={<Home />} />
-          <Route path="/performance" element={<Performance />} />
+          <Route path="/nutrition" element={<Nutrition />} />
           <Route path="/techniques" element={<Techniques />} />
           <Route path="/diet" element={<Diet />} />
-          <Route path="/rankings" element={<Rankings />} />
         </Route>
 
         {/* Pages without Navbar */}

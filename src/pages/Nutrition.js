@@ -1,9 +1,9 @@
 // NutritionForm.js
 import React, { useState, useEffect, useRef } from 'react';
 import emailjs from '@emailjs/browser';
-import './Performance.css';
+import './Nutrition.css';
 
-const Performance = () => {
+const Nutrition = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
   const [formCompleted, setFormCompleted] = useState(false);
@@ -271,6 +271,13 @@ const Performance = () => {
       condition: { id: 'alcohol', value: 'Yes' },
       required: true
     },
+    {
+      id: 'smoking_habits',
+      type: 'checkbox',
+      title: 'Do you use cigarettes, vaping, or anything similar?',
+      options: ['Cigarettes', 'Vaping', 'Other'],
+      required: false
+    },    
     {
       id: 'cheat_meals',
       type: 'yes_no',
@@ -691,4 +698,4 @@ const generatePDFAndSendEmail = async () => {
   );
 };
 
-export default Performance;
+export default Nutrition;

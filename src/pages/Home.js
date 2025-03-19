@@ -10,17 +10,16 @@ function Home() {
       <div
         className="hero-section text-white d-flex align-items-center text-center"
         style={{
-          backgroundImage: "url('/jackie-images/bjjmentoria.png')",
-          backgroundSize: 'cover',   // Ensures the image covers the container
+          backgroundImage: "url('/jackie-images/dr-jackie-hero.jpeg')",
+          backgroundSize: 'cover', // Default behavior for larger screens
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           width: '100%',
-          height: '100vh',            // Ensures full viewport height on all devices
+          height: '100vh', // Ensures full viewport height on all devices
           minHeight: '100vh',
-          backgroundAttachment: 'fixed',  // Optional: Keeps the image fixed on scroll
+          backgroundAttachment: 'fixed', // Optional: Keeps the image fixed on scroll
         }}
       >
-
         <Container>
           <Row>
             <Col>
@@ -98,6 +97,7 @@ function Home() {
             Join Now
           </Button>
         </Container>
+        
       </section>
 
       {/* Footer */}

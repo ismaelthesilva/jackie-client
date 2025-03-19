@@ -93,6 +93,30 @@
   color: #ffffff !important;
 }
 
+/* Image Home */
+.hero-section {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    min-height: 50vh;  /* Make it smaller for mobile screens */
+    background-size: contain;  /* Make sure image fits in the container */
+  }
+}
+
+@media (min-width: 769px) {
+  .hero-section {
+    height: 100vh;  /* Full height for larger screens */
+    min-height: 100vh;
+    background-size: cover;  /* Full coverage on larger screens */
+  }
+}
+
+
 /* Ensure font availability */
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto:wght@300;400&display=swap');
 

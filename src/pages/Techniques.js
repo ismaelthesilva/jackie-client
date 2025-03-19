@@ -28,7 +28,7 @@ const Techniques = () => {
       {/* Footer (optional, matching Home.js) */}
       <footer className="bg-dark text-white text-center py-3">
         <Container>
-          <p className="mb-0">© 2025 BJJ Champ. Roll with us soon!</p>
+          <p className="mb-0">© 2025 Dr. Jackie</p>
         </Container>
       </footer>
     </>

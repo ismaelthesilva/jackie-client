@@ -8,14 +8,19 @@ function Home() {
     <>
       {/* Hero Section */}
       <div
-        className="hero-section text-white d-flex align-items-center min-vh-75 text-center"
+        className="hero-section text-white d-flex align-items-center text-center"
         style={{
-          backgroundImage: "url('/jackie-images/dr-jackie-hero.jpeg')", // Replace with an image of Dr. Jackie training or a fitness scene
-          backgroundSize: 'cover',
+          backgroundImage: "url('/jackie-images/bjjmentoria.png')",
+          backgroundSize: 'cover',   // Ensures the image covers the container
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
+          width: '100%',
+          height: '100vh',            // Ensures full viewport height on all devices
+          minHeight: '100vh',
+          backgroundAttachment: 'fixed',  // Optional: Keeps the image fixed on scroll
         }}
       >
+
         <Container>
           <Row>
             <Col>
@@ -23,13 +28,13 @@ function Home() {
                 Transform Your Body with Dr. Jackie
               </h1>
               <p className="lead mb-4 animate__animated animate__fadeIn animate__delay-1s">
-                Expert Training & Nutrition from a Doctor Who Gets Results
+                Expert Personal Training to Achieve Your Fitness Goals
               </p>
               <Button
-                variant="warning" // Orange accent
+                variant="warning"
                 size="lg"
                 className="mt-3 animate__animated animate__pulse animate__infinite"
-                href="#signup"
+                href="mailto:ptcityfitness@jackiesouto.com"
               >
                 Start Your Journey
               </Button>
@@ -49,10 +54,10 @@ function Home() {
               <Card className="h-100 shadow-sm border-0">
                 <Card.Body>
                   <Card.Title className="fw-bold" style={{ color: '#008080' }}>
-                    Weight Loss Plans
+                    Personal Training Plans
                   </Card.Title>
                   <Card.Text>
-                    Medically-backed strategies to shed pounds safely and sustainably.
+                    Customized training plans designed to help you reach your fitness goals.
                   </Card.Text>
                 </Card.Body>
               </Card>
@@ -64,7 +69,7 @@ function Home() {
                     Sports Performance
                   </Card.Title>
                   <Card.Text>
-                    Training to compete at your peak, tailored to your goals.
+                    Tailored training to enhance your sports performance and endurance.
                   </Card.Text>
                 </Card.Body>
               </Card>
@@ -73,10 +78,10 @@ function Home() {
               <Card className="h-100 shadow-sm border-0">
                 <Card.Body>
                   <Card.Title className="fw-bold" style={{ color: '#008080' }}>
-                    Custom Diets
+                    Strength & Conditioning
                   </Card.Title>
                   <Card.Text>
-                    Nutrition plans designed by a doctor for your lifestyle.
+                    Focused workouts to improve strength, conditioning, and overall fitness.
                   </Card.Text>
                 </Card.Body>
               </Card>
@@ -88,10 +93,8 @@ function Home() {
       {/* Call-to-Action Section */}
       <section className="py-5 text-center" style={{ backgroundColor: '#008080' }}>
         <Container>
-          <h3 className="text-white mb-4">
-            Ready to Get Fit with a Pro?
-          </h3>
-          <Button variant="warning" size="lg" href="#signup">
+          <h3 className="text-white mb-4">Ready to Get Fit with a Pro?</h3>
+          <Button variant="warning" size="lg" href="mailto:ptcityfitness@jackiesouto.com">
             Join Now
           </Button>
         </Container>

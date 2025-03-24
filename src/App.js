@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { LanguageProvider } from './context/LanguageContext';
 import Navbar from './components/Navbar'; // Updated path
 import Home from './pages/Home';
 import Nutrition from './pages/Nutrition';
@@ -30,29 +31,31 @@ function LayoutWithoutNavbar() {
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* Pages with Navbar */}
-        <Route element={<LayoutWithNavbar />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/nutrition" element={<Nutrition />} />
-          <Route path="/techniques" element={<Techniques />} />
-          <Route path="/diet" element={<Diet />} />
-        </Route>
+    <LanguageProvider>
+      <Router>
+        <Routes>
+          {/* Pages with Navbar */}
+          <Route element={<LayoutWithNavbar />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/nutrition" element={<Nutrition />} />
+            <Route path="/techniques" element={<Techniques />} />
+            <Route path="/diet" element={<Diet />} />
+          </Route>
 
-        {/* Pages without Navbar */}
-        <Route element={<LayoutWithoutNavbar />}>
-          <Route path="/PageOne" element={<PageOne />} />
-          <Route path="/index" element={<IndexPage />} />
-          <Route path="/BJJ40USA" element={<BJJ40USA />} />
-          <Route path="/Performance2" element={<Performance2 />} />
-          <Route path="/BJJ40BR" element={<BJJ40BR />} />
-          <Route path="/BJJMentoria" element={<BJJMentoria />} />
-          <Route path="/Obrigado" element={<Obrigado />} />
-          <Route path="/ObrigadoUpsell" element={<ObrigadoUpsell />} />
-        </Route>
-      </Routes>
-    </Router>
+          {/* Pages without Navbar */}
+          <Route element={<LayoutWithoutNavbar />}>
+            <Route path="/PageOne" element={<PageOne />} />
+            <Route path="/index" element={<IndexPage />} />
+            <Route path="/BJJ40USA" element={<BJJ40USA />} />
+            <Route path="/Performance2" element={<Performance2 />} />
+            <Route path="/BJJ40BR" element={<BJJ40BR />} />
+            <Route path="/BJJMentoria" element={<BJJMentoria />} />
+            <Route path="/Obrigado" element={<Obrigado />} />
+            <Route path="/ObrigadoUpsell" element={<ObrigadoUpsell />} />
+          </Route>
+        </Routes>
+      </Router>
+    </LanguageProvider>
   );
 }
 

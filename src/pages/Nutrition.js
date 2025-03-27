@@ -1,5 +1,5 @@
 // NutritionForm.js
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import emailjs from '@emailjs/browser';
 import './Nutrition.css';
 
@@ -12,7 +12,7 @@ const Nutrition = () => {
   const [clientEmail, setClientEmail] = useState('');
   const formRef = useRef();
 
-  const questions = [
+  const questions = useMemo(() => [
     {
       id: 'welcome',
       type: 'welcome',
@@ -446,24 +446,24 @@ const Nutrition = () => {
       title: 'Thank you for completing the nutrition questionnaire!',
       description: 'We will analyze your responses and send your personalized nutrition plan to your email soon.'
     }
-  ];
+  ], []);
 
-  const shouldDisplayQuestion = (question) => {
+  const shouldDisplayQuestion = useCallback((question) => {
     if (!question.condition) return true;
     const { id, value } = question.condition;
     return answers[id] === value;
-  };
+  }, [answers]);
 
-  const getNextQuestion = (currentIndex) => {
+  const getNextQuestion = useCallback((currentIndex) => {
     for (let i = currentIndex + 1; i < questions.length; i++) {
       if (shouldDisplayQuestion(questions[i])) {
         return i;
       }
     }
     return questions.length - 1;
-  };
+  }, [questions, shouldDisplayQuestion]);
 
-  const handleAnswer = (questionId, answer) => {
+  const handleAnswer = useCallback((questionId, answer) => {
     setAnswers(prev => ({ ...prev, [questionId]: answer }));
     if (questionId === 'email') {
       setClientEmail(answer);
@@ -473,73 +473,72 @@ const Nutrition = () => {
     if (nextIndex === questions.length - 1) {
       setFormCompleted(true);
     }
-  };
+  }, [currentQuestion, getNextQuestion, questions.length]);
+
+  const generatePDFAndSendEmail = useCallback(async () => {
+    setIsLoading(true);
+    console.log('Starting generatePDFAndSendEmail...');
+    try {
+      console.log('Building email body...');
+      let emailBody = '<h1>Nutrition Assessment</h1>';
+      emailBody += '<h2>Client Details</h2>';
+      emailBody += `<p><strong>Name:</strong> ${answers.name || 'N/A'}</p>`;
+      emailBody += `<p><strong>Age:</strong> ${answers.age || 'N/A'} years</p>`;
+      emailBody += `<p><strong>Height:</strong> ${answers.height || 'N/A'} cm</p>`;
+      emailBody += `<p><strong>Weight:</strong> ${answers.weight || 'N/A'} kg</p>`;
+      emailBody += `<p><strong>Main Goal:</strong> ${answers.goal || 'N/A'}</p>`;
+      emailBody += '<h2>Questionnaire Responses</h2>';
+      questions.forEach((question) => {
+        if (question.type === 'welcome' || question.type === 'thank_you' || 
+            ['name', 'age', 'height', 'weight', 'goal', 'email'].includes(question.id)) {
+          return;
+        }
+        if (!shouldDisplayQuestion(question)) {
+          return;
+        }
+        if (!answers[question.id] && answers[question.id] !== 0) {
+          return;
+        }
+        let answerText = answers[question.id];
+        if (Array.isArray(answerText)) {
+          answerText = answerText.join(', ');
+        }
+        emailBody += `<p><strong>${question.title}</strong><br>${answerText}</p>`;
+      });
+
+      const templateParams = {
+        to_email: 'jacksouto7@gmail.com',
+        client_name: answers.name || 'Client',
+        client_email: clientEmail || 'N/A',
+        email_body: emailBody
+      };
+      console.log('Email params prepared:', templateParams);
+
+      console.log('Sending email via EmailJS...');
+      const response = await emailjs.send(
+        'service_28v1fvr',   // Service ID
+        'template_wj6zu2c',  // Template ID
+        templateParams,
+        'ezbPPmM_lDMistyGT' // Public Key
+      );
+      console.log('EmailJS response:', response);
+
+      setEmailSent(true);
+      console.log('Email sent successfully, state updated');
+    } catch (error) {
+      console.error('Error in generatePDFAndSendEmail:', error);
+      alert('Failed to send email. Please check the console for details and try again.');
+    } finally {
+      setIsLoading(false);
+      console.log('Process completed, loading state reset');
+    }
+  }, [answers, clientEmail, questions, shouldDisplayQuestion]);
 
   useEffect(() => {
     if (formCompleted) {
       generatePDFAndSendEmail();
     }
-  }, [formCompleted]);
-
-//EmailJS
-const generatePDFAndSendEmail = async () => {
-  setIsLoading(true);
-  console.log('Starting generatePDFAndSendEmail...');
-  try {
-    console.log('Building email body...');
-    let emailBody = '<h1>Nutrition Assessment</h1>';
-    emailBody += '<h2>Client Details</h2>';
-    emailBody += `<p><strong>Name:</strong> ${answers.name || 'N/A'}</p>`;
-    emailBody += `<p><strong>Age:</strong> ${answers.age || 'N/A'} years</p>`;
-    emailBody += `<p><strong>Height:</strong> ${answers.height || 'N/A'} cm</p>`;
-    emailBody += `<p><strong>Weight:</strong> ${answers.weight || 'N/A'} kg</p>`;
-    emailBody += `<p><strong>Main Goal:</strong> ${answers.goal || 'N/A'}</p>`;
-    emailBody += '<h2>Questionnaire Responses</h2>';
-    questions.forEach((question) => {
-      if (question.type === 'welcome' || question.type === 'thank_you' || 
-          ['name', 'age', 'height', 'weight', 'goal', 'email'].includes(question.id)) {
-        return;
-      }
-      if (!shouldDisplayQuestion(question)) {
-        return;
-      }
-      if (!answers[question.id] && answers[question.id] !== 0) {
-        return;
-      }
-      let answerText = answers[question.id];
-      if (Array.isArray(answerText)) {
-        answerText = answerText.join(', ');
-      }
-      emailBody += `<p><strong>${question.title}</strong><br>${answerText}</p>`;
-    });
-
-    const templateParams = {
-      to_email: 'jacksouto7@gmail.com',
-      client_name: answers.name || 'Client',
-      client_email: clientEmail || 'N/A',
-      email_body: emailBody
-    };
-    console.log('Email params prepared:', templateParams);
-
-    console.log('Sending email via EmailJS...');
-    const response = await emailjs.send(
-      'service_28v1fvr',   // Your Service ID
-      'template_wj6zu2c',  // Your Template ID
-      templateParams,
-      'ezbPPmM_lDMistyGT' // Your Public Key
-    );
-    console.log('EmailJS response:', response);
-
-    setEmailSent(true);
-    console.log('Email sent successfully, state updated');
-  } catch (error) {
-    console.error('Error in generatePDFAndSendEmail:', error);
-    alert('Failed to send email. Please check the console for details and try again.');
-  } finally {
-    setIsLoading(false);
-    console.log('Process completed, loading state reset');
-  }
-};
+  }, [formCompleted, generatePDFAndSendEmail]);
 
   const renderQuestion = () => {
     const currentQ = questions[currentQuestion];
@@ -547,6 +546,16 @@ const generatePDFAndSendEmail = async () => {
     const handleKeyPress = (e, value) => {
       if (e.key === 'Enter' && (value || !currentQ.required)) {
         handleAnswer(currentQ.id, value);
+      }
+    };
+
+    const handleBack = () => {
+      // Find the previous visible question
+      for (let i = currentQuestion - 1; i >= 0; i--) {
+        if (shouldDisplayQuestion(questions[i])) {
+          setCurrentQuestion(i);
+          break;
+        }
       }
     };
 
@@ -592,13 +601,23 @@ const generatePDFAndSendEmail = async () => {
               required={currentQ.required}
               autoFocus
             />
-            <button 
-              className="typeform-btn"
-              onClick={() => handleAnswer(currentQ.id, answers[currentQ.id] || '')}
-              disabled={currentQ.required && !answers[currentQ.id]}
-            >
-              Next
-            </button>
+            <div className="button-group">
+              {currentQuestion > 0 && (
+                <button 
+                  className="typeform-btn back-btn"
+                  onClick={handleBack}
+                >
+                  Back
+                </button>
+              )}
+              <button 
+                className="typeform-btn"
+                onClick={() => handleAnswer(currentQ.id, answers[currentQ.id] || '')}
+                disabled={currentQ.required && !answers[currentQ.id]}
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
 
@@ -612,44 +631,78 @@ const generatePDFAndSendEmail = async () => {
               required={currentQ.required}
               autoFocus
             />
-            <button 
-              className="typeform-btn"
-              onClick={() => handleAnswer(currentQ.id, answers[currentQ.id] || '')}
-              disabled={currentQ.required && !answers[currentQ.id]}
-            >
-              Next
-            </button>
+            <div className="button-group">
+              {currentQuestion > 0 && (
+                <button 
+                  className="typeform-btn back-btn"
+                  onClick={handleBack}
+                >
+                  Back
+                </button>
+              )}
+              <button 
+                className="typeform-btn"
+                onClick={() => handleAnswer(currentQ.id, answers[currentQ.id] || '')}
+                disabled={currentQ.required && !answers[currentQ.id]}
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
 
         {currentQ.type === 'yes_no' && (
-          <div className="options-group">
-            <button
-              className={`typeform-option ${answers[currentQ.id] === 'Yes' ? 'selected' : ''}`}
-              onClick={() => handleAnswer(currentQ.id, 'Yes')}
-            >
-              Yes
-            </button>
-            <button
-              className={`typeform-option ${answers[currentQ.id] === 'No' ? 'selected' : ''}`}
-              onClick={() => handleAnswer(currentQ.id, 'No')}
-            >
-              No
-            </button>
+          <div className="input-group">
+            <div className="options-group">
+              <button
+                className={`typeform-option ${answers[currentQ.id] === 'Yes' ? 'selected' : ''}`}
+                onClick={() => handleAnswer(currentQ.id, 'Yes')}
+              >
+                Yes
+              </button>
+              <button
+                className={`typeform-option ${answers[currentQ.id] === 'No' ? 'selected' : ''}`}
+                onClick={() => handleAnswer(currentQ.id, 'No')}
+              >
+                No
+              </button>
+            </div>
+            <div className="button-group">
+              {currentQuestion > 0 && (
+                <button 
+                  className="typeform-btn back-btn"
+                  onClick={handleBack}
+                >
+                  Back
+                </button>
+              )}
+            </div>
           </div>
         )}
 
         {currentQ.type === 'multiple_choice' && (
-          <div className="options-group">
-            {currentQ.options.map((option) => (
-              <button
-                key={option}
-                className={`typeform-option ${answers[currentQ.id] === option ? 'selected' : ''}`}
-                onClick={() => handleAnswer(currentQ.id, option)}
-              >
-                {option}
-              </button>
-            ))}
+          <div className="input-group">
+            <div className="options-group">
+              {currentQ.options.map((option) => (
+                <button
+                  key={option}
+                  className={`typeform-option ${answers[currentQ.id] === option ? 'selected' : ''}`}
+                  onClick={() => handleAnswer(currentQ.id, option)}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+            <div className="button-group">
+              {currentQuestion > 0 && (
+                <button 
+                  className="typeform-btn back-btn"
+                  onClick={handleBack}
+                >
+                  Back
+                </button>
+              )}
+            </div>
           </div>
         )}
 
@@ -672,41 +725,67 @@ const generatePDFAndSendEmail = async () => {
                 {option}
               </button>
             ))}
-            <button
-              className="typeform-btn"
-              onClick={() => handleAnswer(currentQ.id, answers[currentQ.id] || [])}
-              disabled={currentQ.required && (!answers[currentQ.id] || answers[currentQ.id].length === 0)}
-            >
-              Next
-            </button>
+            <div className="button-group">
+              {currentQuestion > 0 && (
+                <button 
+                  className="typeform-btn back-btn"
+                  onClick={handleBack}
+                >
+                  Back
+                </button>
+              )}
+              <button
+                className="typeform-btn"
+                onClick={() => handleAnswer(currentQ.id, answers[currentQ.id] || [])}
+                disabled={currentQ.required && (!answers[currentQ.id] || answers[currentQ.id].length === 0)}
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
 
         {currentQ.type === 'checkbox' && (
-          <div className="options-group">
-            {currentQ.options.map((option) => (
-              <button
-                key={option}
-                className={`typeform-option ${
-                  answers[currentQ.id]?.includes(option) ? 'selected' : ''
-                }`}
-                onClick={() => {
-                  const currentSelection = answers[currentQ.id] || [];
-                  const newSelection = currentSelection.includes(option)
-                    ? currentSelection.filter(item => item !== option)
-                    : [...currentSelection, option];
-                  setAnswers(prev => ({ ...prev, [currentQ.id]: newSelection }));
-                }}
-              >
-                {option}
-              </button>
-            ))}
-            <button
-              className="typeform-btn"
-              onClick={() => handleAnswer(currentQ.id, answers[currentQ.id] || [])}
-            >
-              Next
-            </button>
+          <div className="input-group">
+            <div className="options-group">
+              {currentQ.options.map((option) => (
+                <button
+                  key={option}
+                  className={`typeform-option ${
+                    answers[currentQ.id]?.includes(option) ? 'selected' : ''
+                  }`}
+                  onClick={() => {
+                    const currentSelection = answers[currentQ.id] || [];
+                    const newSelection = currentSelection.includes(option)
+                      ? currentSelection.filter(item => item !== option)
+                      : [...currentSelection, option];
+                    setAnswers(prev => ({ ...prev, [currentQ.id]: newSelection }));
+                  }}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+            <div className="button-group">
+              <div className="button-left">
+                {currentQuestion > 0 && (
+                  <button 
+                    className="typeform-btn back-btn"
+                    onClick={handleBack}
+                  >
+                    Back
+                  </button>
+                )}
+              </div>
+              <div className="button-right">
+                <button
+                  className="typeform-btn"
+                  onClick={() => handleAnswer(currentQ.id, answers[currentQ.id] || [])}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>

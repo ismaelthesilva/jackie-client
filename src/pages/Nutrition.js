@@ -681,6 +681,34 @@ const generatePDFAndSendEmail = async () => {
             </button>
           </div>
         )}
+
+        {currentQ.type === 'checkbox' && (
+          <div className="options-group">
+            {currentQ.options.map((option) => (
+              <button
+                key={option}
+                className={`typeform-option ${
+                  answers[currentQ.id]?.includes(option) ? 'selected' : ''
+                }`}
+                onClick={() => {
+                  const currentSelection = answers[currentQ.id] || [];
+                  const newSelection = currentSelection.includes(option)
+                    ? currentSelection.filter(item => item !== option)
+                    : [...currentSelection, option];
+                  setAnswers(prev => ({ ...prev, [currentQ.id]: newSelection }));
+                }}
+              >
+                {option}
+              </button>
+            ))}
+            <button
+              className="typeform-btn"
+              onClick={() => handleAnswer(currentQ.id, answers[currentQ.id] || [])}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     );
   };

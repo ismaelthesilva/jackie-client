@@ -365,6 +365,13 @@ const Nutrition = () => {
       required: true
     },
     {
+      id: 'local_foods_details',
+      type: 'textarea',
+      title: 'Please describe which local foods you prefer:',
+      condition: { id: 'local_foods', value: 'Yes' },
+      required: true
+    },
+    {
       id: 'work_schedule',
       type: 'multiple_choice',
       title: 'Do you work fixed hours or shift work?',
@@ -394,6 +401,13 @@ const Nutrition = () => {
       id: 'outdoor_activities',
       type: 'yes_no',
       title: 'Do you often engage in outdoor activities? (e.g., hiking, sports, cycling, beach)',
+      required: true
+    },
+    {
+      id: 'outdoor_activities_details',
+      type: 'textarea',
+      title: 'What outdoor activities do you enjoy?',
+      condition: { id: 'outdoor_activities', value: 'Yes' },
       required: true
     },
     {
@@ -465,15 +479,47 @@ const Nutrition = () => {
 
   const handleAnswer = useCallback((questionId, answer) => {
     setAnswers(prev => ({ ...prev, [questionId]: answer }));
+    
     if (questionId === 'email') {
       setClientEmail(answer);
     }
+
+    // Find the current question
+    const currentQ = questions.find(q => q.id === questionId);
+    
+    // If it's a yes/no question
+    if (currentQ.type === 'yes_no') {
+      // If answer is 'No', find the next non-conditional question
+      if (answer === 'No') {
+        const nextIndex = getNextQuestion(currentQuestion);
+        setCurrentQuestion(nextIndex);
+        if (nextIndex === questions.length - 1) {
+          setFormCompleted(true);
+        }
+        return;
+      }
+      // If answer is 'Yes', find the next conditional question
+      if (answer === 'Yes') {
+        const nextIndex = questions.findIndex((q, index) => 
+          index > currentQuestion && 
+          q.condition && 
+          q.condition.id === questionId && 
+          q.condition.value === 'Yes'
+        );
+        if (nextIndex !== -1) {
+          setCurrentQuestion(nextIndex);
+          return;
+        }
+      }
+    }
+
+    // For all other questions, proceed to next question
     const nextIndex = getNextQuestion(currentQuestion);
     setCurrentQuestion(nextIndex);
     if (nextIndex === questions.length - 1) {
       setFormCompleted(true);
     }
-  }, [currentQuestion, getNextQuestion, questions.length]);
+  }, [currentQuestion, getNextQuestion, questions]);
 
   const generatePDFAndSendEmail = useCallback(async () => {
     setIsLoading(true);
